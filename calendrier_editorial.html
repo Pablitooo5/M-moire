@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendrier Éditorial – Ewigo Eysines</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f9; color: #1a1a2e; }
+
+  /* HEADER */
+  .header {
+    background: #fff;
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 3px solid #e5233d;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .header img { height: 52px; object-fit: contain; }
+  .header-title { text-align: center; }
+  .header-title h1 { font-size: 22px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.5px; }
+  .header-title p { font-size: 13px; color: #666; margin-top: 3px; }
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+
+  /* NAV */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 18px;
+    background: #fff;
+    border-bottom: 1px solid #e8e8e8;
+  }
+  .nav button {
+    background: none;
+    border: 2px solid #e5233d;
+    color: #e5233d;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .nav button:hover { background: #e5233d; color: white; }
+  .nav h2 { font-size: 22px; font-weight: 700; min-width: 220px; text-align: center; color: #1a1a2e; }
+
+  /* ADD BTN */
+  .add-btn {
+    background: #e5233d;
+    color: white;
+    border: none;
+    padding: 9px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s;
+  }
+  .add-btn:hover { background: #c01c33; }
+
+  /* LEGEND */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 14px 24px;
+    background: #fff;
+    border-bottom: 1px solid #e8e8e8;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #444;
+  }
+  .legend-dot {
+    width: 12px; height: 12px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  /* CALENDAR GRID — une seule grille unifiée header + jours */
+  .calendar-wrap { padding: 24px; }
+  .calendar {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+
+  /* Headers intégrés dans la même grille */
+  .day-header {
+    background: #1a1a2e;
+    color: white;
+    text-align: center;
+    padding: 12px 4px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .day-header.weekend { color: #e5233d; }
+
+  /* Cellules jours */
+  .day-cell {
+    min-height: 110px;
+    border-right: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    padding: 6px;
+    overflow: hidden;
+  }
+  /* Supprimer la bordure droite de la 7ème colonne de chaque ligne */
+  .day-cell:nth-child(7n) { border-right: none; }
+  .day-cell.empty { background: #fafafa; }
+  .day-cell.today { background: #fff8f9; }
+  .day-cell.today .day-num { background: #e5233d; color: white; }
+  .day-num {
+    font-size: 13px;
+    font-weight: 700;
+    color: #333;
+    width: 26px; height: 26px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    margin-bottom: 4px;
+  }
+  .day-cell.weekend-day .day-num { color: #e5233d; }
+
+  /* EVENTS */
+  .event {
+    font-size: 11px;
+    padding: 3px 6px;
+    border-radius: 4px;
+    margin-bottom: 3px;
+    cursor: pointer;
+    line-height: 1.3;
+    font-weight: 500;
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+    transition: opacity 0.15s, transform 0.15s;
+    color: white;
+  }
+  .event:hover { opacity: 0.85; transform: translateY(-1px); }
+  .event .event-icon { font-size: 11px; flex-shrink: 0; margin-top: 1px; }
+  .event .event-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .event .del-btn {
+    opacity: 0;
+    background: rgba(0,0,0,0.25);
+    border: none;
+    color: white;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    font-size: 9px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: opacity 0.15s;
+    padding: 0;
+    line-height: 1;
+  }
+  .event:hover .del-btn { opacity: 1; }
+
+  /* TYPE COLORS */
+  .t-vehicule   { background: #1d4ed8; }
+  .t-humour     { background: #ea580c; }
+  .t-campagne   { background: #7c3aed; }
+  .t-actu       { background: #15803d; }
+  .t-afterwork  { background: #db2777; }
+  .t-ewigo      { background: #0d9488; }
+  .t-coulisses  { background: #b45309; }
+  .t-trend      { background: #dc2626; }
+
+  /* STATS BAR */
+  .stats {
+    display: flex;
+    gap: 16px;
+    padding: 14px 24px 0;
+    flex-wrap: wrap;
+  }
+  .stat-card {
+    background: white;
+    border-radius: 8px;
+    padding: 12px 20px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+    text-align: center;
+    min-width: 100px;
+  }
+  .stat-card .stat-num { font-size: 26px; font-weight: 800; color: #e5233d; }
+  .stat-card .stat-label { font-size: 11px; color: #666; margin-top: 2px; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: white;
+    border-radius: 12px;
+    padding: 28px;
+    width: 460px;
+    max-width: 95vw;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+    position: relative;
+  }
+  .modal h3 { font-size: 18px; font-weight: 700; margin-bottom: 20px; color: #1a1a2e; }
+  .modal-close {
+    position: absolute; top: 16px; right: 16px;
+    background: none; border: none; font-size: 22px; cursor: pointer; color: #999;
+  }
+  .modal-close:hover { color: #333; }
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 600; color: #444; margin-bottom: 5px; }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1.5px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus { outline: none; border-color: #e5233d; }
+  .form-group textarea { height: 70px; resize: vertical; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+  .btn-primary { background: #e5233d; color: white; border: none; padding: 10px 24px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .btn-primary:hover { background: #c01c33; }
+  .btn-secondary { background: none; color: #666; border: 1.5px solid #ddd; padding: 10px 18px; border-radius: 6px; font-size: 14px; cursor: pointer; }
+  .btn-secondary:hover { background: #f5f5f5; }
+
+  @media (max-width: 700px) {
+    .calendar-wrap { padding: 10px; }
+    .day-cell { min-height: 70px; }
+    .event .event-text { display: none; }
+    .legend { gap: 6px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <img src="/Users/pablo/Documents/EWIGO/LOGO /ewigo_BS_Noir copie.png" alt="Ewigo" onerror="this.style.display='none'; document.getElementById('fallback-logo').style.display='block'">
+  <span id="fallback-logo" style="display:none; font-size:26px; font-weight:800; color:#e5233d; letter-spacing:1px;">EWIGO</span>
+  <div class="header-title">
+    <h1>📅 Calendrier Éditorial</h1>
+    <p>Agence Ewigo Eysines — Réseaux sociaux</p>
+  </div>
+  <button class="add-btn" onclick="openAddModal()">＋ Ajouter une publication</button>
+</div>
+
+<!-- LÉGENDE -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot t-vehicule"></div>Présentation véhicule</div>
+  <div class="legend-item"><div class="legend-dot t-humour"></div>Humour / Mise en scène</div>
+  <div class="legend-item"><div class="legend-dot t-ewigo"></div>Concept Ewigo</div>
+  <div class="legend-item"><div class="legend-dot t-actu"></div>5 Actualités</div>
+  <div class="legend-item"><div class="legend-dot t-campagne"></div>Campagne automatique (Digitaleo)</div>
+  <div class="legend-item"><div class="legend-dot t-afterwork"></div>After Work</div>
+  <div class="legend-item"><div class="legend-dot t-coulisses"></div>Coulisses / Studio</div>
+  <div class="legend-item"><div class="legend-dot t-trend"></div>Trend</div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <button onclick="prevMonth()">◀ Mois précédent</button>
+  <h2 id="month-title"></h2>
+  <button onclick="nextMonth()">Mois suivant ▶</button>
+</div>
+
+<!-- STATS -->
+<div class="stats" id="stats-bar"></div>
+
+<!-- CALENDAR — grille unique -->
+<div class="calendar-wrap">
+  <div class="calendar" id="calendar-grid">
+    <div class="day-header">Lundi</div>
+    <div class="day-header">Mardi</div>
+    <div class="day-header">Mercredi</div>
+    <div class="day-header">Jeudi</div>
+    <div class="day-header">Vendredi</div>
+    <div class="day-header weekend">Samedi</div>
+    <div class="day-header weekend">Dimanche</div>
+    <!-- Les cellules jours sont injectées ici par JS -->
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3 id="modal-title">Ajouter une publication</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label>📅 Date</label>
+        <input type="date" id="f-date">
+      </div>
+      <div class="form-group">
+        <label>📱 Plateforme</label>
+        <select id="f-platform">
+          <option>Instagram + Facebook</option>
+          <option>Instagram</option>
+          <option>Facebook</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>🎨 Type</label>
+        <select id="f-type">
+          <option value="vehicule">🚗 Présentation véhicule</option>
+          <option value="humour">🎭 Humour / Mise en scène</option>
+          <option value="ewigo">🎯 Concept Ewigo</option>
+          <option value="actu">📰 5 Actualités</option>
+          <option value="campagne">📋 Campagne automatique</option>
+          <option value="afterwork">🤝 After Work</option>
+          <option value="coulisses">📸 Coulisses / Studio</option>
+          <option value="trend">🔥 Trend</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>🎬 Format</label>
+        <select id="f-format">
+          <option>Vidéo</option>
+          <option>Vidéo cinématique</option>
+          <option>Vidéo mise en scène</option>
+          <option>Vidéo trend</option>
+          <option>Carrousel</option>
+          <option>Photo</option>
+          <option>Campagne auto (Digitaleo)</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>📝 Description / Message clé</label>
+      <textarea id="f-desc" placeholder="Ex : Présentation BMW X2 – disponibilité à domicile"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Annuler</button>
+      <button class="btn-primary" onclick="saveEvent()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── DATA ────────────────────────────────────────────────────
+const TYPES = {
+  vehicule:  { label: 'Présentation véhicule',       icon: '🚗', cls: 't-vehicule' },
+  humour:    { label: 'Humour / Mise en scène',       icon: '🎭', cls: 't-humour' },
+  campagne:  { label: 'Campagne automatique',         icon: '📋', cls: 't-campagne' },
+  actu:      { label: '5 Actualités',                 icon: '📰', cls: 't-actu' },
+  afterwork: { label: 'After Work',                   icon: '🤝', cls: 't-afterwork' },
+  ewigo:     { label: 'Concept Ewigo',                icon: '🎯', cls: 't-ewigo' },
+  coulisses: { label: 'Coulisses / Studio',           icon: '📸', cls: 't-coulisses' },
+  trend:     { label: 'Trend',                        icon: '🔥', cls: 't-trend' },
+};
+
+let events = [
+  // Janvier 2026
+  { id:101, date:'2026-01-02', type:'vehicule',  platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Présentation – Kia Picanto' },
+  { id:102, date:'2026-01-06', type:'vehicule',  platform:'Instagram + Facebook', format:'Carrousel',               desc:'Présentation de 3 véhicules sur le parc' },
+  { id:103, date:'2026-01-08', type:'humour',    platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Humour' },
+  { id:104, date:'2026-01-13', type:'vehicule',  platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Présentation de 3 véhicules' },
+  { id:105, date:'2026-01-19', type:'actu',      platform:'Facebook + Instagram', format:'Carrousel',               desc:'5 actualités de la semaine' },
+  { id:106, date:'2026-01-19', type:'humour',    platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Humour' },
+  { id:107, date:'2026-01-21', type:'campagne',  platform:'Facebook + Instagram', format:'Campagne auto (Digitaleo)', desc:'Campagne Mercedes CLA' },
+  { id:108, date:'2026-01-21', type:'humour',    platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Humour – "Venez chez Ewigo"' },
+  { id:109, date:'2026-01-23', type:'humour',    platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Humour' },
+  { id:110, date:'2026-01-26', type:'vehicule',  platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Livraison Audi Q3 – réaction client' },
+  { id:1,  date:'2026-01-28', type:'humour',    platform:'Instagram + Facebook', format:'Vidéo mise en scène',     desc:'Humour – Padel' },
+  { id:2,  date:'2026-01-29', type:'campagne',  platform:'Facebook + Instagram', format:'Campagne auto (Digitaleo)', desc:'5 actualités du mois automobile' },
+  { id:3,  date:'2026-01-30', type:'afterwork', platform:'Instagram + Facebook', format:'Vidéo',                   desc:'After Work – Networking pros auto (dernier mardi du mois)' },
+  // Février 2026
+  { id:4,  date:'2026-02-03', type:'humour',    platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Humour – Audi Q3' },
+  { id:5,  date:'2026-02-04', type:'campagne',  platform:'Facebook + Instagram', format:'Campagne auto (Digitaleo)', desc:'Meilleure chaîne de l\'année 2026' },
+  { id:6,  date:'2026-02-05', type:'vehicule',  platform:'Instagram + Facebook', format:'Vidéo cinématique',       desc:'Audi Q5 (format horizontal)' },
+  { id:7,  date:'2026-02-11', type:'campagne',  platform:'Facebook + Instagram', format:'Campagne auto (Digitaleo)', desc:'Saint-Valentin' },
+  { id:8,  date:'2026-02-11', type:'vehicule',  platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Smart électrique' },
+  { id:9,  date:'2026-02-16', type:'actu',      platform:'Facebook + Instagram', format:'Carrousel',               desc:'5 actualités de la semaine' },
+  { id:10, date:'2026-02-16', type:'humour',    platform:'Instagram',            format:'Vidéo',                   desc:'Humour' },
+  { id:11, date:'2026-02-18', type:'campagne',  platform:'Facebook + Instagram', format:'Campagne auto (Digitaleo)', desc:'Campagne automatique' },
+  { id:12, date:'2026-02-18', type:'humour',    platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Humour' },
+  { id:13, date:'2026-02-20', type:'trend',     platform:'Instagram',            format:'Vidéo trend',             desc:'Vidéo trend' },
+  { id:14, date:'2026-02-23', type:'actu',      platform:'Facebook + Instagram', format:'Carrousel',               desc:'5 actualités de la semaine' },
+  { id:15, date:'2026-02-23', type:'vehicule',  platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Présentation – Hyundai' },
+  { id:16, date:'2026-02-25', type:'campagne',  platform:'Facebook + Instagram', format:'Carrousel',               desc:'5 actualités du mois (Digitaleo)' },
+  { id:17, date:'2026-02-25', type:'vehicule',  platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Renault Scénic' },
+  { id:18, date:'2026-02-27', type:'ewigo',     platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Principe Ewigo – "Vendez votre voiture avec Ewigo"' },
+  // Mars 2026
+  { id:19, date:'2026-03-02', type:'humour',    platform:'Instagram + Facebook', format:'Vidéo mise en scène',     desc:'Humour – Venir vendre chez Ewigo' },
+  { id:20, date:'2026-03-04', type:'campagne',  platform:'Facebook + Instagram', format:'Carrousel',               desc:'Campagne Audi A6 (Digitaleo)' },
+  { id:21, date:'2026-03-04', type:'humour',    platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Humour + théorique – Vendre sa voiture chez Ewigo' },
+  { id:22, date:'2026-03-06', type:'coulisses', platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Installation barbier – Agence Cestas' },
+  { id:23, date:'2026-03-10', type:'humour',    platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Humour – Actualité prix de l\'essence' },
+  { id:24, date:'2026-03-12', type:'ewigo',     platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Principe Ewigo – Administratif, sécurisation paiement, photos, concept complet' },
+  { id:25, date:'2026-03-16', type:'actu',      platform:'Facebook + Instagram', format:'Carrousel',               desc:'5 actualités de la semaine' },
+  { id:26, date:'2026-03-16', type:'vehicule',  platform:'Instagram + Facebook', format:'Vidéo',                   desc:'BMW Série 1' },
+  { id:27, date:'2026-03-19', type:'vehicule',  platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Porsche Macan' },
+  { id:28, date:'2026-03-20', type:'humour',    platform:'Instagram + Facebook', format:'Vidéo mise en scène',     desc:'Humour' },
+  { id:29, date:'2026-03-23', type:'actu',      platform:'Facebook + Instagram', format:'Carrousel',               desc:'5 actualités de la semaine' },
+  { id:30, date:'2026-03-23', type:'coulisses', platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Studio photo – Angles de prise de vue des véhicules' },
+  { id:31, date:'2026-03-25', type:'ewigo',     platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Estimation de votre véhicule – comment on fixe un prix équilibré' },
+  { id:32, date:'2026-03-26', type:'campagne',  platform:'Facebook + Instagram', format:'Campagne auto (Digitaleo)', desc:'5 actualités du mois' },
+  { id:33, date:'2026-03-27', type:'vehicule',  platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Renault Clio 5' },
+  { id:34, date:'2026-03-30', type:'actu',      platform:'Facebook + Instagram', format:'Carrousel',               desc:'5 actualités de la semaine' },
+  { id:35, date:'2026-03-30', type:'trend',     platform:'Instagram',            format:'Vidéo trend',             desc:'Vidéo trend' },
+  // Avril 2026
+  { id:36, date:'2026-04-01', type:'vehicule',  platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Corvette C6' },
+  { id:37, date:'2026-04-03', type:'ewigo',     platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Sécurisation paiement – Cash Sentinelle, compte séquestre' },
+  { id:38, date:'2026-04-08', type:'campagne',  platform:'Facebook + Instagram', format:'Carrousel',               desc:'Campagne Renault Twingo (Digitaleo)' },
+  { id:39, date:'2026-04-08', type:'coulisses', platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Shooting photo en direct – Skoda' },
+  { id:40, date:'2026-04-10', type:'afterwork', platform:'Instagram + Facebook', format:'Vidéo',                   desc:'After Work – Networking pros auto (dernier mardi du mois)' },
+  { id:41, date:'2026-04-13', type:'actu',      platform:'Facebook + Instagram', format:'Carrousel',               desc:'5 actualités de la semaine' },
+  { id:42, date:'2026-04-13', type:'vehicule',  platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Livraison Nissan 370Z' },
+  { id:43, date:'2026-04-17', type:'vehicule',  platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Hyundai i30 N' },
+  { id:44, date:'2026-04-20', type:'actu',      platform:'Facebook + Instagram', format:'Carrousel',               desc:'5 actualités de la semaine' },
+  { id:45, date:'2026-04-20', type:'humour',    platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Humour – Sécuriser les ventes de véhicules' },
+  { id:46, date:'2026-04-22', type:'vehicule',  platform:'Instagram + Facebook', format:'Vidéo',                   desc:'BMW Série 1' },
+  { id:47, date:'2026-04-27', type:'actu',      platform:'Facebook + Instagram', format:'Carrousel',               desc:'5 actualités de la semaine' },
+  { id:48, date:'2026-04-27', type:'vehicule',  platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Hyundai i10' },
+  { id:49, date:'2026-04-29', type:'humour',    platform:'Instagram + Facebook', format:'Vidéo mise en scène',     desc:'Humour – Charte Ewigo / reprises disponibles' },
+  { id:50, date:'2026-04-30', type:'campagne',  platform:'Facebook + Instagram', format:'Campagne auto (Digitaleo)', desc:'5 actualités du mois' },
+  // Mai 2026
+  { id:51, date:'2026-05-04', type:'humour',    platform:'Instagram + Facebook', format:'Vidéo mise en scène',     desc:'Humour – "On s\'occupe de tout" (vente de voiture)' },
+  { id:52, date:'2026-05-04', type:'vehicule',  platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Présentation de 5 véhicules sur le parc' },
+  { id:53, date:'2026-05-06', type:'vehicule',  platform:'Instagram + Facebook', format:'Vidéo',                   desc:'BMW X2 – Disponibilité + récupération à domicile' },
+  { id:54, date:'2026-05-08', type:'vehicule',  platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Ford Ranger' },
+  { id:55, date:'2026-05-12', type:'vehicule',  platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Opel Mokka' },
+];
+
+let nextId = 56;
+let currentYear = 2026;
+let currentMonth = 0; // 0 = janvier
+let editingId = null;
+
+const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+
+// ─── RENDER ──────────────────────────────────────────────────
+function render() {
+  renderStats();
+  renderCalendar();
+}
+
+function renderStats() {
+  const monthStr = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}`;
+  const monthEvents = events.filter(e => e.date.startsWith(monthStr));
+  const counts = {};
+  monthEvents.forEach(e => { counts[e.type] = (counts[e.type]||0)+1; });
+
+  document.getElementById('month-title').textContent = `${MONTHS_FR[currentMonth]} ${currentYear}`;
+
+  const bar = document.getElementById('stats-bar');
+  bar.innerHTML = `
+    <div class="stat-card"><div class="stat-num">${monthEvents.length}</div><div class="stat-label">Publications ce mois</div></div>
+    ${Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([t,n])=>`
+      <div class="stat-card"><div class="stat-num" style="color:inherit">${n}</div><div class="stat-label">${TYPES[t]?.icon||''} ${TYPES[t]?.label||t}</div></div>
+    `).join('')}
+  `;
+}
+
+function renderCalendar() {
+  // Vider tout sauf les 7 headers fixes
+  const grid = document.getElementById('calendar-grid');
+  // Supprimer toutes les cellules jours (garder les 7 headers)
+  const headers = Array.from(grid.querySelectorAll('.day-header'));
+  grid.innerHTML = '';
+  headers.forEach(h => grid.appendChild(h));
+
+  const firstDay = new Date(currentYear, currentMonth, 1);
+  const lastDay  = new Date(currentYear, currentMonth+1, 0);
+  // Monday-based: 0=Mon, 6=Sun
+  let startOffset = (firstDay.getDay() + 6) % 7;
+  const today = new Date();
+
+  // Empty cells
+  for(let i=0; i<startOffset; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'day-cell empty';
+    grid.appendChild(cell);
+  }
+
+  for(let d=1; d<=lastDay.getDate(); d++) {
+    const dateStr = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dow = (new Date(currentYear, currentMonth, d).getDay() + 6) % 7; // 0=Mon
+    const isWeekend = dow >= 5;
+    const isToday = (today.getFullYear()===currentYear && today.getMonth()===currentMonth && today.getDate()===d);
+
+    const cell = document.createElement('div');
+    cell.className = `day-cell${isWeekend?' weekend-day':''}${isToday?' today':''}`;
+
+    const numEl = document.createElement('div');
+    numEl.className = 'day-num';
+    numEl.textContent = d;
+    cell.appendChild(numEl);
+
+    // Events for this day
+    const dayEvents = events.filter(e => e.date === dateStr);
+    dayEvents.forEach(ev => {
+      const t = TYPES[ev.type] || {};
+      const el = document.createElement('div');
+      el.className = `event ${t.cls||''}`;
+      el.title = `${ev.desc}\n${ev.platform} · ${ev.format}`;
+      el.innerHTML = `<span class="event-icon">${t.icon||'📌'}</span><span class="event-text">${ev.desc}</span><button class="del-btn" onclick="deleteEvent(${ev.id},event)">✕</button>`;
+      el.addEventListener('click', (e) => { if(!e.target.classList.contains('del-btn')) openEditModal(ev.id); });
+      cell.appendChild(el);
+    });
+
+    grid.appendChild(cell);
+  }
+
+  // Remplir les cellules vides à la fin pour compléter la dernière ligne
+  const totalCells = startOffset + lastDay.getDate();
+  const remainder = totalCells % 7;
+  if (remainder !== 0) {
+    for (let i = 0; i < 7 - remainder; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'day-cell empty';
+      grid.appendChild(cell);
+    }
+  }
+}
+
+// ─── NAVIGATION ──────────────────────────────────────────────
+function prevMonth() {
+  currentMonth--;
+  if(currentMonth < 0) { currentMonth = 11; currentYear--; }
+  render();
+}
+function nextMonth() {
+  currentMonth++;
+  if(currentMonth > 11) { currentMonth = 0; currentYear++; }
+  render();
+}
+
+// ─── MODAL ───────────────────────────────────────────────────
+function openAddModal(dateStr='') {
+  editingId = null;
+  document.getElementById('modal-title').textContent = '＋ Ajouter une publication';
+  document.getElementById('f-date').value = dateStr || `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-01`;
+  document.getElementById('f-platform').value = 'Instagram + Facebook';
+  document.getElementById('f-type').value = 'vehicule';
+  document.getElementById('f-format').value = 'Vidéo';
+  document.getElementById('f-desc').value = '';
+  document.getElementById('modal').classList.add('active');
+}
+
+function openEditModal(id) {
+  const ev = events.find(e => e.id === id);
+  if(!ev) return;
+  editingId = id;
+  document.getElementById('modal-title').textContent = '✏️ Modifier la publication';
+  document.getElementById('f-date').value = ev.date;
+  document.getElementById('f-platform').value = ev.platform;
+  document.getElementById('f-type').value = ev.type;
+  document.getElementById('f-format').value = ev.format;
+  document.getElementById('f-desc').value = ev.desc;
+  document.getElementById('modal').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('active');
+}
+
+function saveEvent() {
+  const date = document.getElementById('f-date').value;
+  const platform = document.getElementById('f-platform').value;
+  const type = document.getElementById('f-type').value;
+  const format = document.getElementById('f-format').value;
+  const desc = document.getElementById('f-desc').value.trim();
+  if(!date || !desc) { alert('Veuillez remplir la date et la description.'); return; }
+
+  if(editingId) {
+    const ev = events.find(e => e.id === editingId);
+    if(ev) { ev.date=date; ev.platform=platform; ev.type=type; ev.format=format; ev.desc=desc; }
+  } else {
+    events.push({ id: nextId++, date, type, platform, format, desc });
+  }
+  closeModal();
+  render();
+}
+
+function deleteEvent(id, e) {
+  e.stopPropagation();
+  if(confirm('Supprimer cette publication ?')) {
+    events = events.filter(ev => ev.id !== id);
+    render();
+  }
+}
+
+// Fermer modal en cliquant dehors
+document.getElementById('modal').addEventListener('click', function(e) {
+  if(e.target === this) closeModal();
+});
+
+// ─── INIT ─────────────────────────────────────────────────────
+// Aller au premier mois avec des données (janvier 2026)
+render();
+</script>
+</body>
+</html>
