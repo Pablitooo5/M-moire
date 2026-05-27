@@ -180,6 +180,7 @@
   .t-ewigo      { background: #0d9488; }
   .t-coulisses  { background: #b45309; }
   .t-trend      { background: #dc2626; }
+  .t-event24h   { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color:#fff; }
 
   /* STATS BAR */
   .stats {
@@ -279,6 +280,7 @@
   <div class="legend-item"><div class="legend-dot t-afterwork"></div>After Work</div>
   <div class="legend-item"><div class="legend-dot t-coulisses"></div>Coulisses / Studio</div>
   <div class="legend-item"><div class="legend-dot t-trend"></div>Trend</div>
+  <div class="legend-item"><div class="legend-dot t-event24h"></div>Événement 24h du Mans</div>
 </div>
 
 <!-- NAV -->
@@ -336,6 +338,7 @@
           <option value="afterwork">🤝 After Work</option>
           <option value="coulisses">📸 Coulisses / Studio</option>
           <option value="trend">🔥 Trend</option>
+          <option value="event24h">🏁 Événement 24h du Mans</option>
         </select>
       </div>
       <div class="form-group">
@@ -373,6 +376,7 @@ const TYPES = {
   ewigo:     { label: 'Concept Ewigo',                icon: '🎯', cls: 't-ewigo' },
   coulisses: { label: 'Coulisses / Studio',           icon: '📸', cls: 't-coulisses' },
   trend:     { label: 'Trend',                        icon: '🔥', cls: 't-trend' },
+  event24h:  { label: 'Événement 24h du Mans',        icon: '🏁', cls: 't-event24h' },
 };
 
 let events = [
@@ -446,9 +450,36 @@ let events = [
   { id:53, date:'2026-05-06', type:'vehicule',  platform:'Instagram + Facebook', format:'Vidéo',                   desc:'BMW X2 – Disponibilité + récupération à domicile' },
   { id:54, date:'2026-05-08', type:'vehicule',  platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Ford Ranger' },
   { id:55, date:'2026-05-12', type:'vehicule',  platform:'Instagram + Facebook', format:'Vidéo',                   desc:'Opel Mokka' },
+
+  // ─── CAMPAGNE 24H DU MANS – Événement du 13 juin 2026 ───
+  // SEMAINE 1 — LANCEMENT (27 mai – 2 juin)
+  { id:200, date:'2026-05-27', type:'event24h', platform:'Instagram + Facebook', format:'Post statique',
+    desc:'POST 1 – Lancement : affiche officielle de l\'événement. Caption courte et percutante. Ex : "Ça arrive. Samedi 13 juin. 👀". Stories : repost affiche + sticker compte à rebours + sticker question "Vous connaissez les 24h du Mans ?".' },
+  { id:201, date:'2026-05-29', type:'event24h', platform:'Instagram + Facebook', format:'Reel (vidéo à filmer)',
+    desc:'POST 2 – Annonce officielle face caméra : date, lieu, grandes activités. Vidéo principale de lancement. Script déjà disponible.' },
+  { id:202, date:'2026-06-01', type:'event24h', platform:'Instagram + Facebook', format:'Reel court ou Post statique',
+    desc:'POST 3 – Teaser concert Les Manson : présenter le groupe, style de musique, créer l\'envie. Photo ou visuel du groupe. Script léger si vidéo.' },
+
+  // SEMAINE 2 — ACTIVATION (3 – 9 juin)
+  { id:203, date:'2026-06-04', type:'event24h', platform:'Instagram + Facebook', format:'Reel ⭐ SPONSORISÉ N°1',
+    desc:'POST 4 – Récap dynamique de toutes les activités (30-45s). Vidéo BOOSTÉE. Ciblage Bordeaux/Gironde, 18-45 ans. Objectif notoriété et reach maximum.' },
+  { id:204, date:'2026-06-06', type:'event24h', platform:'Instagram + Facebook', format:'Reel (vidéo à filmer)',
+    desc:'POST 5 – Appel à exposants voitures : s\'adresser aux propriétaires de belles voitures, les inviter à exposer. Numéro 05 40 24 08 20 et DM pour s\'inscrire.' },
+  { id:205, date:'2026-06-08', type:'event24h', platform:'Instagram + Facebook', format:'Post statique',
+    desc:'POST 6 – Programme complet de la journée. Visuel type programme avec toutes les activités listées. Caption : "Voilà tout ce qui vous attend samedi 13 juin 👇". Stories semaine : food truck, Insolente Tattoo, simulateur auto, dernières places expo voitures.' },
+
+  // SEMAINE 3 — URGENCE (10 – 13 juin)
+  { id:206, date:'2026-06-10', type:'event24h', platform:'Instagram',            format:'Story interactive',
+    desc:'Story sondage/quiz uniquement : "Tu viens samedi ? OUI / PAS ENCORE". Objectif engagement et rappel. Pas de post feed.' },
+  { id:207, date:'2026-06-11', type:'event24h', platform:'Instagram + Facebook', format:'Reel ⭐ SPONSORISÉ N°2',
+    desc:'POST 7 – J-2, dernière chance (15s max). Date et lieu très visibles. Boostée en retargeting sur ceux ayant vu la vidéo sponsorisée N°1. Objectif conversion.' },
+  { id:208, date:'2026-06-12', type:'event24h', platform:'Instagram + Facebook', format:'Reel court (vidéo à filmer)',
+    desc:'POST 8 – "Demain c\'est le jour". Annonce que c\'est demain, dernières infos pratiques, adresse, ambiance hype et naturelle.' },
+  { id:209, date:'2026-06-13', type:'event24h', platform:'Instagram + Facebook', format:'JOUR J – Stories live + Reel récap',
+    desc:'JOUR J – Pas de post planifié : tout se passe en stories live. Filmer voitures, concert, simulateur, ambiance générale. Compte à rebours J-3/J-2/J-1, préparatifs et installation le matin, stories toute la journée, repost stories des participants. Un Reel récap à publier le soir ou le lendemain.' },
 ];
 
-let nextId = 56;
+let nextId = 210;
 let currentYear = 2026;
 let currentMonth = 0; // 0 = janvier
 let editingId = null;
