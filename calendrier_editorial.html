@@ -181,6 +181,7 @@
   .t-coulisses  { background: #b45309; }
   .t-trend      { background: #dc2626; }
   .t-event24h   { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color:#fff; }
+  .t-story24h   { background: linear-gradient(135deg, #fde68a 0%, #fbbf24 100%); color:#7c2d12; border:1px dashed #d97706; }
 
   /* STATS BAR */
   .stats {
@@ -281,6 +282,7 @@
   <div class="legend-item"><div class="legend-dot t-coulisses"></div>Coulisses / Studio</div>
   <div class="legend-item"><div class="legend-dot t-trend"></div>Trend</div>
   <div class="legend-item"><div class="legend-dot t-event24h"></div>Événement 24h du Mans</div>
+  <div class="legend-item"><div class="legend-dot t-story24h"></div>Story 24h du Mans</div>
 </div>
 
 <!-- NAV -->
@@ -339,6 +341,7 @@
           <option value="coulisses">📸 Coulisses / Studio</option>
           <option value="trend">🔥 Trend</option>
           <option value="event24h">🏁 Événement 24h du Mans</option>
+          <option value="story24h">⏱️ Story 24h du Mans</option>
         </select>
       </div>
       <div class="form-group">
@@ -377,6 +380,7 @@ const TYPES = {
   coulisses: { label: 'Coulisses / Studio',           icon: '📸', cls: 't-coulisses' },
   trend:     { label: 'Trend',                        icon: '🔥', cls: 't-trend' },
   event24h:  { label: 'Événement 24h du Mans',        icon: '🏁', cls: 't-event24h' },
+  story24h:  { label: 'Story 24h du Mans',            icon: '⏱️', cls: 't-story24h' },
 };
 
 let events = [
@@ -477,6 +481,72 @@ let events = [
     desc:'POST 8 – "Demain c\'est le jour". Annonce que c\'est demain, dernières infos pratiques, adresse, ambiance hype et naturelle.' },
   { id:209, date:'2026-06-13', type:'event24h', platform:'Instagram + Facebook', format:'JOUR J – Stories live + Reel récap',
     desc:'JOUR J – Pas de post planifié : tout se passe en stories live. Filmer voitures, concert, simulateur, ambiance générale. Compte à rebours J-3/J-2/J-1, préparatifs et installation le matin, stories toute la journée, repost stories des participants. Un Reel récap à publier le soir ou le lendemain.' },
+
+  // ─── STORIES 24H DU MANS – Quotidiennes ───
+
+  // SEMAINE 1 — LANCEMENT (curiosité)
+  { id:220, date:'2026-05-27', type:'story24h', platform:'Instagram + Facebook', format:'Story – Repost affiche',
+    desc:'Repost affiche officielle + sticker compte à rebours géant "J-17" + musique tendance. Mood : intrigue, mystère.' },
+  { id:221, date:'2026-05-28', type:'story24h', platform:'Instagram',            format:'Story – Sticker question',
+    desc:'Sticker question : "Vous connaissez les 24h du Mans ?". Récolter les réponses pour les reposter le lendemain.' },
+  { id:222, date:'2026-05-29', type:'story24h', platform:'Instagram + Facebook', format:'Story – Repost Reel annonce',
+    desc:'Repost du Reel d\'annonce en story + sticker "Glisse pour voir ↗" + lien vers le post. Compte à rebours visible.' },
+  { id:223, date:'2026-05-30', type:'story24h', platform:'Instagram',            format:'Story – Sondage',
+    desc:'Sondage : "Tu viens avec qui samedi ?" → 🚗 Famille / 👫 Copains / 🤔 J\'hésite encore. Objectif : engagement + se projeter.' },
+  { id:224, date:'2026-05-31', type:'story24h', platform:'Instagram + Facebook', format:'Story – Coulisses',
+    desc:'Coulisses préparation : photos/vidéos de l\'organisation, repérages du lieu, scénographie. Sticker "Behind the scenes".' },
+  { id:225, date:'2026-06-01', type:'story24h', platform:'Instagram',            format:'Story – Quiz Les Manson',
+    desc:'Quiz interactif : "Quel style musical pour Les Manson ?" Rock / Pop / Reggae / Électro. Suspense entretenu.' },
+  { id:226, date:'2026-06-02', type:'story24h', platform:'Instagram + Facebook', format:'Story – Compte à rebours J-11',
+    desc:'Story compte à rebours visuel J-11 + rappel rapide : date, lieu, gratuit. Format clean et impactant.' },
+
+  // SEMAINE 2 — ACTIVATION (présenter les activités)
+  { id:227, date:'2026-06-03', type:'story24h', platform:'Instagram + Facebook', format:'Story – Mise en avant Food truck',
+    desc:'Présentation du food truck partenaire : nom, type de cuisine, photos de plats appétissants. Sticker "Miam 🤤".' },
+  { id:228, date:'2026-06-04', type:'story24h', platform:'Instagram',            format:'Story – Sondage activités',
+    desc:'Sondage : "Quelle activité te tente le plus ?" Voitures expo / Tattoo / Simulateur / Concert. Engagement + segmentation audience.' },
+  { id:229, date:'2026-06-05', type:'story24h', platform:'Instagram + Facebook', format:'Story – Insolente Tattoo',
+    desc:'Mise en avant Insolente Tattoo : exemples de travaux, flash dispos le jour J, photos d\'ambiance studio. Tag du compte tatoueur.' },
+  { id:230, date:'2026-06-05', type:'story24h', platform:'Instagram',            format:'Story – Question tattoo',
+    desc:'Sticker question : "Tu oserais te faire tatouer en live samedi ?" Réponses utilisées pour relancer le lendemain.' },
+  { id:231, date:'2026-06-06', type:'story24h', platform:'Instagram + Facebook', format:'Story – Inscription exposants',
+    desc:'Story exposants : "Vous voulez exposer votre voiture ? DM ou 05 40 24 08 20". Exemples de voitures déjà inscrites.' },
+  { id:232, date:'2026-06-07', type:'story24h', platform:'Instagram + Facebook', format:'Story – Simulateur auto',
+    desc:'Mise en avant simulateur automobile : extrait vidéo, défi "Tu oses ? 🏁 Meilleur chrono = prix". Ton fun et challengeur.' },
+  { id:233, date:'2026-06-08', type:'story24h', platform:'Instagram + Facebook', format:'Story – Programme détaillé (swipe)',
+    desc:'Série de stories programme : 1) Matin / 2) Midi / 3) Après-midi / 4) Soir / 5) Concert. Format swipeable, dégradé orange.' },
+  { id:234, date:'2026-06-09', type:'story24h', platform:'Instagram',            format:'Story – Sondage horaire',
+    desc:'Sondage : "Tu viendras à quelle heure ?" Matin / Midi / Après-midi / Soir (concert). Permet d\'anticiper l\'afflux.' },
+
+  // SEMAINE 3 — URGENCE (conversion finale)
+  { id:235, date:'2026-06-10', type:'story24h', platform:'Instagram + Facebook', format:'Story – Compte à rebours J-3',
+    desc:'Story compte à rebours J-3 visuel impactant + rappel adresse précise + parking + horaires.' },
+  { id:236, date:'2026-06-11', type:'story24h', platform:'Instagram + Facebook', format:'Story – Repost Reel sponsorisé N°2',
+    desc:'Repost du Reel sponsorisé J-2 en story + sticker "Réservé ta journée ? 📅" + bouton lien.' },
+  { id:237, date:'2026-06-11', type:'story24h', platform:'Instagram',            format:'Story – Q&A "Posez vos questions"',
+    desc:'Sticker "Question box" : "Posez vos questions sur l\'événement". Répondre en story dans la foulée. Forte interaction.' },
+  { id:238, date:'2026-06-12', type:'story24h', platform:'Instagram + Facebook', format:'Story – J-1 installation',
+    desc:'Stories installation matérielle : montage scène, livraison food truck, arrivée des premières voitures exposants. Sticker "Demain c\'est partyyy 🎉".' },
+  { id:239, date:'2026-06-12', type:'story24h', platform:'Instagram',            format:'Story – Météo + dernier rappel',
+    desc:'Story météo officielle + dernier rappel : adresse Google Maps cliquable, horaires, gratuit, ambiance. Compte à rebours J-1.' },
+
+  // JOUR J — 13 juin (stories live)
+  { id:240, date:'2026-06-13', type:'story24h', platform:'Instagram + Facebook', format:'Stories LIVE – Matin "C\'est parti"',
+    desc:'7h-10h : "C\'est aujourd\'hui ! 🏁" + installation finale, équipe sur place, premières voitures qui arrivent.' },
+  { id:241, date:'2026-06-13', type:'story24h', platform:'Instagram + Facebook', format:'Stories LIVE – Expo voitures',
+    desc:'10h-14h : Filmer chaque voiture exposée individuellement, tag des propriétaires, gros plans esthétiques. Stickers "🔥 Cette beauté".' },
+  { id:242, date:'2026-06-13', type:'story24h', platform:'Instagram + Facebook', format:'Stories LIVE – Simulateur + Tattoo',
+    desc:'14h-17h : Capter les participants au simulateur (classement live), les tatouages en cours chez Insolente Tattoo, réactions visiteurs.' },
+  { id:243, date:'2026-06-13', type:'story24h', platform:'Instagram + Facebook', format:'Stories LIVE – Food + ambiance',
+    desc:'17h-19h : Food truck en action, files d\'attente, plats servis, visiteurs qui mangent, ambiance qui monte avant le concert.' },
+  { id:244, date:'2026-06-13', type:'story24h', platform:'Instagram + Facebook', format:'Stories LIVE – Concert Les Manson',
+    desc:'19h-22h : Concert Les Manson en live, foule, ambiance, extraits musique. Repost stories des participants en continu.' },
+  { id:245, date:'2026-06-13', type:'story24h', platform:'Instagram + Facebook', format:'Stories – Repost participants',
+    desc:'Tout au long de la journée : reposter les stories des visiteurs qui tagguent @ewigoeysines. Crée de la preuve sociale en direct.' },
+
+  // J+1 — Lendemain
+  { id:246, date:'2026-06-14', type:'story24h', platform:'Instagram + Facebook', format:'Story – Remerciements',
+    desc:'Story remerciements : "Merci d\'avoir été là 🙏" + photos best-of + teaser Reel récap à venir. Tag des partenaires (Food truck, Insolente Tattoo, Les Manson).' },
 ];
 
 let nextId = 210;
